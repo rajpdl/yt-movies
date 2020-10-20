@@ -17,7 +17,7 @@ app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Credentials', true);
     next();
 });
-const port = process.env.PORT | 8000;
+const port = process.env.PORT || 8000;
 
 app.get('/', (req, res) => {
     res.send('<h1>Welcome To Our Application</h1><a href="/movies">Movies List</a> <a href="/categories">Category List</a><br><p>Now You can do any crud operations with this things');
