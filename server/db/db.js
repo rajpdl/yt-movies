@@ -1,5 +1,7 @@
 const { Sequelize} = require('sequelize');
 
-var sequelize = new Sequelize('postgres://postgres:7252@localhost:5432/movies-list');
+var url = 'postgres://postgres:7252@localhost:5432/movies-list' | process.env.DATABASE_URL ;
+
+var sequelize = new Sequelize(url);
 
 module.exports = { sequelize }

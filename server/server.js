@@ -6,8 +6,10 @@ const _ = require('lodash');
 const { Movies } = require('./models/Movies');
 const { Category } = require('./models/Category');
 const { response } = require('express');
+
 const app = express();
 app.use(bodyParser.json());
+
 app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', '*');
