@@ -32,7 +32,7 @@ app.get('/movies', async (req, res) => {
         if(!movies.length) {
             return res.status(200).send({message: "Nothing is added."});
         }
-        return res.send(movies);
+        res.send(movies);
     }catch(e) {
         return res.sendStatus(500);
     }
