@@ -43,13 +43,13 @@ app.get('/movies', async (req, res) => {
 app.get('/movie/:category_id', async (req, res) => {
     var category_id = req.params.category_id;
     try{
-    var movies = await Movies.findAll({where: {
-        category_id
-    }});
-    if(movies.length == 0) {
-        return res.sendStatus(404);
-    }
-    res.send(movies);
+        var movies = await Movies.findAll({where: {
+            category_id
+        }});
+        if(movies.length == 0) {
+            return res.sendStatus(404);
+        }
+        res.send(movies);
     }catch(e) {
         res.sendStatus(500);
     }
@@ -186,22 +186,26 @@ app.delete('/category/:id', async (req, res) => {
 //Update Category
 app.post('/category/:id', async (req, res) => {
     var id = req.params.id;
-    var category = await Category.findByPk(id);
-    if(!category) {
-        return res.sendStatus(404);
-    }
-    if(req.body.name !== null) {
-        category.name = req.body.name;        
-    }
+   try{
+        var category = await Category.findByPk(id);
+        if(!category) {
+            return res.sendStatus(404);
+        }
+        if(req.body.name !== null) {
+            category.name = req.body.name;        
+        }
 
-    if(req.body.short_description !== null) {
-        category.short_description = req.body.short_description;
-    }
-    if(req.body.long_description !== null) {
-        category.long_description = req.body.long_description;
-    }
-    category.save();
-    res.send(category);
+        if(req.body.short_description !== null) {
+            category.short_description = req.body.short_description;
+        }
+        if(req.body.long_description !== null) {
+            category.long_description = req.body.long_description;
+        }
+        category.save();
+        res.send(category);
+   }catch(e) {
+       res.sendStatus(500);
+   }
 });
 
 
