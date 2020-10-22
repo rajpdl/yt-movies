@@ -1,7 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const _ = require('lodash');
-const redis = require('redis');
 
 
 const { Movies } = require('./models/Movies');
@@ -9,7 +8,6 @@ const { Category } = require('./models/Category');
 const { response } = require('express');
 
 const app = express();
-var redisClient = redis.createClient();
 app.use(bodyParser.json());
 
 app.use(function (req, res, next) {
@@ -29,19 +27,6 @@ app.get('/', (req, res) => {
 
 //Get Movies
 app.get('/movies', async (req, res) => {
-    // redisClient.get('movies', async (error, result) => {
-    //     if(error){return res.status(400).send(error);}
-    //     if(!result) {
-    //         try{
-    //             var movies = await Movies.findAll();
-    //             redisClient.set('movies', JSON.stringify(movies));
-    //             return res.send(movies);
-    //         }catch(e) {
-    //             return res.sendStatus(400);
-    //         }
-    //     }
-    //     res.send(result);
-    // });
     try{
         var movies = await Movies.findAll();
         return res.send(movies);
