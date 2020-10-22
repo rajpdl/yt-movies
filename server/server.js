@@ -44,7 +44,6 @@ app.get('/movies', async (req, res) => {
     // });
     try{
         var movies = await Movies.findAll();
-        // redisClient.set('movies', JSON.stringify(movies));
         return res.send(movies);
     }catch(e) {
         return res.sendStatus(400);
@@ -115,6 +114,9 @@ app.post('/movie/:id', async(req, res) => {
     var body = _.pick(req.body, "url", "title", "description", "category_id");
     try{
         var movie = await Movies.findByPk(id);
+        if(!movie) {
+            return res.sendStatus(404);
+        }
         if(body.url !== null) {
             movie.url =  body.url;
         }
