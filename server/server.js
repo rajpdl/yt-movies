@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const _ = require('lodash');
+const redis = require('redis');
 
 
 const { Movies } = require('./models/Movies');
@@ -8,6 +9,7 @@ const { Category } = require('./models/Category');
 const { response } = require('express');
 
 const app = express();
+var redisClient = redis.createClient();
 app.use(bodyParser.json());
 
 app.use(function (req, res, next) {
@@ -25,15 +27,32 @@ app.get('/', (req, res) => {
 
 //Movies CRUD
 
+//Get Movies
 app.get('/movies', async (req, res) => {
+    // redisClient.get('movies', async (error, result) => {
+    //     if(error){return res.status(400).send(error);}
+    //     if(!result) {
+    //         try{
+    //             var movies = await Movies.findAll();
+    //             redisClient.set('movies', JSON.stringify(movies));
+    //             return res.send(movies);
+    //         }catch(e) {
+    //             return res.sendStatus(400);
+    //         }
+    //     }
+    //     res.send(result);
+    // });
     try{
         var movies = await Movies.findAll();
-        res.send(movies);
+        // redisClient.set('movies', JSON.stringify(movies));
+        return res.send(movies);
     }catch(e) {
-        res.status(400).send({error: "May be you have problem in connection"});
+        return res.sendStatus(400);
     }
+
 });
 
+//Get Movies By Category
 app.get('/movie/:category_id', async (req, res) => {
     var category_id = req.params.category_id;
     try{
@@ -41,51 +60,56 @@ app.get('/movie/:category_id', async (req, res) => {
         category_id
     }});
     if(movies.length == 0) {
-        res.send(false);
+        return res.sendStatus(404);
     }
     res.send(movies);
     }catch(e) {
-        res.status(400).send({error: "May be you have problem in connection"});
+        res.status(500).send({error: "May be you have problem in connection"});
     }
 });
 
+
+//Create New Movie
 app.post('/movie', async(req, res) => {
     try{
         var result = new Movies(req.body);
         var movie = await result.save();
         res.send(movie);
     }catch(e) {
-        res.status(400).send({error: "May be you have problem in connection"});
+        res.sendStatus(500);
     }
 });
 
 
+//Delete Movie By Id
 app.delete('/movie/:id', async ( req, res) => {
     var id = req.params.id;
     try{
         var movie = await Movies.destroy({where: {id}});
-        if(movie) {
-            res.send(true);
+        if(!movie) {
+            return res.sendStatus(404);
         }
-        res.send(false);
+        res.sendStatus(200);
     }catch(e) {
-        res.status(400).send({error: "May be you have problem in connection"});
+        res.sendStatus(500);
     }
 });
 
+//Get Movie By Id
 app.get('/movieByID/:id', async( req, res) => {
     var id = req.params.id;
     try{
         var  movie = await Movies.findByPk(id);
-        if(movie !== null) {
-            res.send(movie);
+        if(!movie) {
+            return res.sendStatus(404);
         }
-        res.send({message: "May be you entered the wrong id"});
+        res.send(movie);
     }catch(e) {
-        res.status(400).send({error: "May be you have problem in connection"});
+        res.sendStatus(500);
     }
 });
 
+//Update Movie
 app.post('/movie/:id', async(req, res) => {
     var id = req.params.id;
     var body = _.pick(req.body, "url", "title", "description", "category_id");
@@ -114,6 +138,8 @@ app.post('/movie/:id', async(req, res) => {
 });
 
 //Category CRUD
+
+//Get Categories
 app.get('/categories', async (req, res) => {
     try {
         var categories = await Category.findAll();
@@ -123,49 +149,53 @@ app.get('/categories', async (req, res) => {
     }    
 });
 
+//Post New Category
 app.post('/category', async (req, res) => {
     try{
         var result = new Category(req.body);
         var category = await result.save();
         res.send(category);
     }catch(e) {
-        res.status(400).send({error: 'May be you have problem in connection'});
+        res.sendStatus(500);
     }
 });
 
+//Get Category By Id
 app.get('/category/:id', async( req, res) => {
     var id = req.params.id;
     try {
-        var category = await Category.findByPk(id);
-        if(category === null) {
-            res.send({message: "Please enter the valid info"});
+        var category = await Category.findByPk(id);        
+        if(!category) {
+            return res.sendStatus(404);
         }
         res.send(category);
     }catch(e) {
-        res.status(400).send({error: 'May be you have problem in connection'});
+        res.sendStatus(500);
     }
 });
 
+//Delete Category By Id
 app.delete('/category/:id', async (req, res) => {
     var id = req.params.id;
     try{
         var category = await Category.destroy({where: {
             id
         }});
-        if(category) {
-            res.send(true);
+        if(!category) {
+            return res.sendStatus(404);
         }
-        res.send(false);
+        res.sendStatus(200);
     }catch(e) {
-        res.status(400).send({error: 'May be you have problem in connection'});
+        res.sendStatus(500);
     }
 });
 
+//Update Category
 app.post('/category/:id', async (req, res) => {
     var id = req.params.id;
     var category = await Category.findByPk(id);
-    if(category == null) {
-        res.send({message: "Please enter the valid id"});
+    if(!category) {
+        return res.sendStatus(404);
     }
     if(req.body.name !== null) {
         category.name = req.body.name;        
@@ -177,7 +207,6 @@ app.post('/category/:id', async (req, res) => {
     if(req.body.long_description !== null) {
         category.long_description = req.body.long_description;
     }
-
     category.save();
     res.send(category);
 });
