@@ -138,7 +138,7 @@ app.get('/categories', async (req, res) => {
         }
         res.send(categories);
     }catch(e) {
-        res.sendStatus(400);
+        res.sendStatus(500);
     }    
 });
 
