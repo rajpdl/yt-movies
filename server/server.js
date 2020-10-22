@@ -28,10 +28,7 @@ app.get('/', (req, res) => {
 //Get Movies
 app.get('/movies', async (req, res) => {
     try{
-        var movies = await Movies.findAll();
-        if(!movies.length) {
-            return res.status(200).send({message: "Nothing is added."});
-        }
+        var movies = await Movies.findAll();        
         res.send(movies);
     }catch(e) {
         return res.sendStatus(500);
@@ -132,10 +129,7 @@ app.post('/movie/:id', async(req, res) => {
 //Get Categories
 app.get('/categories', async (req, res) => {
     try {
-        var categories = await Category.findAll();
-        if(!categories.length) {
-            return res.status(200).send({message: "Nothing is added."})
-        }
+        var categories = await Category.findAll();        
         res.send(categories);
     }catch(e) {
         res.sendStatus(500);
