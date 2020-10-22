@@ -29,9 +29,12 @@ app.get('/', (req, res) => {
 app.get('/movies', async (req, res) => {
     try{
         var movies = await Movies.findAll();
+        if(!movies.length) {
+            return res.status(200).send({message: "Nothing is added."});
+        }
         return res.send(movies);
     }catch(e) {
-        return res.sendStatus(400);
+        return res.sendStatus(500);
     }
 
 });
@@ -48,7 +51,7 @@ app.get('/movie/:category_id', async (req, res) => {
     }
     res.send(movies);
     }catch(e) {
-        res.status(500).send({error: "May be you have problem in connection"});
+        res.sendStatus(500);
     }
 });
 
@@ -119,7 +122,7 @@ app.post('/movie/:id', async(req, res) => {
         var result = await movie.save();
         res.send(result);
     }catch(e) {
-        res.status(400).send({error: "May be you have problem in connection"});
+        res.sendStatus(500)
     }
     
 });
@@ -130,9 +133,12 @@ app.post('/movie/:id', async(req, res) => {
 app.get('/categories', async (req, res) => {
     try {
         var categories = await Category.findAll();
+        if(!categories.length) {
+            return res.status(200).send({message: "Nothing is added."})
+        }
         res.send(categories);
     }catch(e) {
-        res.send({error: "May be you have problem in connection"});
+        res.sendStatus(400);
     }    
 });
 
